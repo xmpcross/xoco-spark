@@ -1,0 +1,210 @@
+---
+import { Image } from "astro:assets";
+import Avatar from "@/components/app/Avatar.astro";
+import BrandMark from "@/components/app/BrandMark.astro";
+import Pill from "@/components/app/Pill.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { attachment } from "@/config/demo";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const results = [
+  { label: "Order found", value: "500" },
+  { label: "Damage confirmed", value: "486" },
+  { label: "Refunded under limit", value: "471" },
+];
+---
+
+<div class:list={["playbook flex w-full flex-col text-[0.8125rem] leading-snug", className]}>
+  <div class="flex h-13 shrink-0 items-center gap-2 border-b border-line px-4">
+    <span class="crumb hidden items-center gap-2 text-muted">Playbooks <Icon name="chevron-right" class="size-3.5" /></span>
+    <span class="truncate font-semibold">Damaged item refund</span>
+    <Pill tone="good">Live</Pill>
+    <span class="test ml-auto hidden items-center gap-1.5 rounded-lg px-2.5 py-1 text-[0.6875rem] font-semibold shadow-[inset_0_0_0_1px_var(--line)]"><Icon name="play" class="size-3" stroke={2.25} />Test</span>
+    <span class="publish ml-auto rounded-lg bg-brand px-2.5 py-1 text-[0.6875rem] font-semibold text-white">Publish</span>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+    <div class="editor min-w-0 flex-1 overflow-hidden bg-[color-mix(in_srgb,var(--page)_55%,var(--surface))] px-4 py-4">
+      <p class="text-[1.0625rem] font-semibold tracking-[-0.02em]">When an item arrives damaged</p>
+      <p class="mt-1 flex items-center gap-1.5 text-[0.6875rem] text-muted">
+        <Avatar name="Ana" class="size-4" />
+        Edited by Ana · Chat, email and voice
+      </p>
+
+      <ol class="steps mt-4 grid gap-2">
+        <li class="step">
+          <span class="num">1</span>
+          <p>Find the order with <span class="tool"><BrandMark name="shopify" class="size-3.5 shadow-none" />shopify.find_order</span> and check it was delivered.</p>
+        </li>
+        <li class="step">
+          <span class="num">2</span>
+          <p>Ask for a photo if there isn't one, and check it shows visible damage.</p>
+        </li>
+        <li class="step">
+          <span class="num">3</span>
+          <div class="min-w-0 flex-1">
+            <p>If the order total is under <strong class="font-semibold">€200</strong>:</p>
+            <div class="branches mt-2 grid gap-1.5 text-[0.75rem]">
+              <p class="rounded-lg bg-surface px-2.5 py-2 shadow-[inset_0_0_0_1px_var(--line)]">
+                <span class="block text-[0.625rem] font-semibold tracking-[0.06em] text-good uppercase">Then</span>
+                Refund in full with <span class="tool"><BrandMark name="stripe" class="size-3.5 shadow-none" />stripe.refund</span>
+              </p>
+              <p class="rounded-lg bg-surface px-2.5 py-2 shadow-[inset_0_0_0_1px_var(--line)]">
+                <span class="block text-[0.625rem] font-semibold tracking-[0.06em] text-warn uppercase">Otherwise</span>
+                Hand off to <span class="font-medium">Returns</span> with the photo attached
+              </p>
+            </div>
+          </div>
+        </li>
+        <li class="step">
+          <span class="num">4</span>
+          <p>Confirm the amount and log the carrier claim with <span class="tool"><BrandMark name="zendesk" class="size-3.5 shadow-none" />zendesk.add_note</span></p>
+        </li>
+      </ol>
+
+      <p class="mt-3 flex flex-wrap gap-1.5 text-[0.6875rem] font-medium">
+        <span class="guard"><Icon name="shield-check" class="size-3 text-good" />Max refund €200</span>
+        <span class="guard"><Icon name="eye-off" class="size-3 text-good" />PII masked</span>
+        <span class="guard"><Icon name="users" class="size-3 text-good" />Hand off if upset</span>
+      </p>
+    </div>
+
+    <div class="run hidden w-60 shrink-0 flex-col border-l border-line p-4">
+      <p class="flex items-center gap-2">
+        <span class="text-[0.625rem] font-semibold tracking-[0.06em] text-muted uppercase">Test run</span>
+        <span class="ml-auto inline-flex items-center gap-1 rounded-md bg-brand-soft px-1.5 py-0.5 text-[0.6875rem] font-semibold text-brand-ink"><Icon name="play" class="size-2.5" stroke={2.5} />Simulate</span>
+      </p>
+      <div class="mt-3 grid gap-1.5 text-[0.75rem]">
+        <p class="max-w-[88%] rounded-xl rounded-bl-sm bg-page px-2.5 py-1.5 shadow-[inset_0_0_0_1px_var(--line)]">My vase arrived in pieces</p>
+        <p class="ml-auto max-w-[88%] rounded-xl rounded-br-sm bg-brand px-2.5 py-1.5 text-white">Oh no, sorry! Could you send a photo of it?</p>
+        <Image src={attachment.photo} alt="" widths={[120, 240]} sizes="6rem" class="aspect-4/3 w-24 rounded-xl rounded-bl-sm object-cover shadow-[0_0_0_1px_var(--line)]" />
+        <p class="ml-auto max-w-[88%] rounded-xl rounded-br-sm bg-brand px-2.5 py-1.5 text-white">Thanks. I've refunded €38.00 to your card.</p>
+      </div>
+      <ul class="mt-4 grid gap-2 text-[0.75rem]">
+        {
+          results.map((result) => (
+            <li class="flex items-center gap-2">
+              <span class="grid size-4 place-items-center rounded-full bg-good-soft text-good">
+                <Icon name="check" class="size-2.5" stroke={3.5} />
+              </span>
+              {result.label}
+              <span class="ml-auto text-muted tabular">{result.value}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-auto border-t border-line pt-3">
+        <p class="flex items-end justify-between">
+          <span>
+            <span class="block text-[1.25rem] font-semibold tracking-[-0.03em] tabular">500</span>
+            <span class="text-[0.6875rem] text-muted">past tickets replayed</span>
+          </span>
+          <span class="text-right">
+            <span class="block text-[1.25rem] font-semibold tracking-[-0.03em] text-good tabular">97.2%</span>
+            <span class="text-[0.6875rem] text-muted">resolved</span>
+          </span>
+        </p>
+        <span class="mt-2.5 flex h-1.5 gap-0.5 overflow-hidden rounded-full">
+          <span class="w-[94.2%] rounded-l-full bg-good"></span>
+          <span class="w-[3%] bg-warn"></span>
+          <span class="flex-1 rounded-r-full bg-line-strong"></span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .playbook {
+    container-type: inline-size;
+  }
+
+  .step {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.75rem;
+    background: var(--surface);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0 1px 2px rgb(12 12 29 / 0.04);
+  }
+
+  .num {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--spark);
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+
+  .tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0 0.35rem 0 0.2rem;
+    border-radius: 0.375rem;
+    background: var(--brand-wash);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 14%, transparent);
+    color: var(--brand-ink);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.35rem;
+    white-space: nowrap;
+    vertical-align: baseline;
+  }
+
+  .guard {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .editor {
+    mask-image: linear-gradient(#000 calc(100% - 3rem), transparent);
+  }
+
+  @container (min-width: 30rem) {
+    .crumb {
+      display: inline-flex;
+    }
+
+    .branches {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @container (min-width: 44rem) {
+    .editor {
+      mask-image: none;
+    }
+
+    .run {
+      display: flex;
+    }
+
+    .test {
+      display: inline-flex;
+    }
+
+    .publish {
+      margin-left: 0;
+    }
+  }
+</style>

@@ -1,0 +1,61 @@
+---
+import Accent from "@/components/ui/Accent.astro";
+import { results } from "@/config/home";
+
+const format = (value: number, decimals = 0) => value.toFixed(decimals);
+---
+
+<section id={results.id} class="py-20 sm:py-28" aria-labelledby="results-title">
+  <div class="shell">
+    <div class="reveal grid gap-6 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-7">
+        <h2 id="results-title" class="text-display-lg"><Accent text={results.title} /></h2>
+      </div>
+      <p class="text-muted lg:col-span-4 lg:col-start-9">{results.note}</p>
+    </div>
+
+    <dl class="mt-14 grid gap-px overflow-hidden rounded-card bg-line shadow-[0_0_0_1px_var(--line)] sm:grid-cols-2 lg:grid-cols-4">
+      {
+        results.stats.map((stat, index) => (
+          <div class="reveal flex flex-col bg-surface p-7 sm:p-8" style={`--i:${index}`}>
+            <dt class="order-2 mt-4 text-muted">{stat.label}</dt>
+            <dd class="order-1 text-[clamp(3rem,2.2rem+2.6vw,4.5rem)] leading-none font-medium tracking-[-0.04em] text-brand">
+              {stat.prefix}
+              <span data-count={stat.value} data-decimals={stat.decimals ?? 0}>{format(stat.value, stat.decimals)}</span>
+              <span class="text-[0.6em]">{stat.suffix}</span>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<script>
+  const counters = [...document.querySelectorAll<HTMLElement>("[data-count]")];
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (counters.length && !reduce && "IntersectionObserver" in window) {
+    const run = (el: HTMLElement) => {
+      const target = Number(el.dataset.count);
+      const decimals = Number(el.dataset.decimals);
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / 1400);
+        el.textContent = (target * (1 - Math.pow(1 - t, 4))).toFixed(decimals);
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    const observer = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          run(entry.target as HTMLElement);
+          observer.unobserve(entry.target);
+        }),
+      { threshold: 0.6 },
+    );
+    counters.forEach((el) => observer.observe(el));
+  }
+</script>

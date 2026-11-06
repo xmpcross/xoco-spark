@@ -1,0 +1,217 @@
+---
+import { Image } from "astro:assets";
+import Accent from "@/components/ui/Accent.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { careers } from "@/config/careers";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const teams = [...new Set(careers.roles.map((role) => role.team))];
+const teamId = (team: string) => team.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+---
+
+<BaseLayout title="Careers" description={careers.lead}>
+  <section class="pattern -mt-(--header-h) pt-[calc(var(--header-h)+3rem)] pb-14 sm:pt-[calc(var(--header-h)+5rem)]">
+    <div class="shell text-center">
+      <h1 class="rise mx-auto max-w-4xl text-display-xl" style="--i:1"><Accent text={careers.title} /></h1>
+      <p class="rise mx-auto mt-6 max-w-2xl text-lead text-muted" style="--i:2">{careers.lead}</p>
+      <a href="#roles" class="rise btn btn-brand mt-9" style="--i:3">
+        See open roles
+        <span class="rounded-full bg-white/20 px-2 py-0.5 text-xs tabular">{careers.roles.length}</span>
+      </a>
+    </div>
+
+    <div class="shell mt-14">
+      <div class="rise grid gap-4 lg:grid-cols-12" style="--i:4">
+        <div class="relative aspect-3/2 overflow-hidden rounded-card lg:col-span-8 lg:aspect-auto lg:min-h-120">
+          <Image
+            src={careers.photo}
+            alt={careers.photoAlt}
+            widths={[640, 960, 1400]}
+            sizes="(min-width: 1024px) 52rem, 100vw"
+            loading="eager"
+            class="absolute inset-0 size-full object-cover"
+          />
+        </div>
+        <dl class="grid gap-4 sm:grid-cols-3 lg:col-span-4 lg:grid-cols-1">
+          {
+            careers.facts.map((fact, index) => (
+              <div class:list={["flex flex-col justify-end rounded-card p-6", index === 0 ? "on-night pattern [--glow:90%_90%_at_100%_0%]" : "bg-surface shadow-[inset_0_0_0_1px_var(--line)]"]}>
+                <dt class="order-2 mt-1 text-muted">{fact.label}</dt>
+                <dd class:list={["order-1 text-5xl leading-none font-medium tracking-tight", index === 0 ? "text-spark" : "text-brand"]}>{fact.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 lg:py-28" aria-labelledby="values-title">
+    <div class="shell">
+      <h2 id="values-title" class="reveal max-w-2xl text-display-md">How we <em>work</em></h2>
+      <ol class="mt-12 grid gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-4">
+        {
+          careers.values.map((value, i) => (
+            <li class="card reveal flex min-h-72 flex-col p-7" style={`--i:${i}`}>
+              <span class="text-5xl leading-none font-medium tracking-tight text-brand tabular">{String(i + 1).padStart(2, "0")}</span>
+              <h3 class="mt-auto pt-10 text-xl font-medium tracking-tight">{value.title}</h3>
+              <p class="mt-2 text-muted">{value.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="on-night pattern py-20 lg:py-28" aria-labelledby="benefits-title">
+    <div class="shell grid gap-12 lg:grid-cols-12 lg:gap-8">
+      <div class="reveal lg:col-span-4">
+        <h2 id="benefits-title" class="text-display-md">What you <em>get</em></h2>
+      </div>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:col-span-8">
+        {
+          careers.benefits.map((benefit, index) => (
+            <li class="card reveal flex gap-4 p-6" style={`--i:${index}`}>
+              <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-spark/10 text-spark">
+                <Icon name={benefit.icon} class="size-5" />
+              </span>
+              <span>
+                <span class="block font-medium">{benefit.title}</span>
+                <span class="mt-1 block text-night-muted">{benefit.body}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section id="roles" class="py-20 lg:py-28" aria-labelledby="roles-title" data-roles>
+    <div class="shell">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <h2 id="roles-title" class="reveal text-display-md">
+          {careers.rolesTitle}
+          <span class="ml-2 align-middle text-[0.5em] text-muted tabular">({careers.roles.length})</span>
+        </h2>
+        <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by team" data-role-filters hidden>
+          <button type="button" class="role-filter" aria-pressed="true" data-team="all">All</button>
+          {
+            teams.map((team) => (
+              <button type="button" class="role-filter" aria-pressed="false" data-team={teamId(team)}>
+                {team}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="mt-12 grid gap-10 lg:mt-14">
+        {
+          teams.map((team) => (
+            <div class="grid gap-3 lg:grid-cols-12 lg:gap-8" data-team-group={teamId(team)}>
+              <h3 class="text-lg font-medium lg:col-span-3 lg:pt-5">{team}</h3>
+              <ul class="grid gap-2 lg:col-span-9">
+                {careers.roles
+                  .filter((role) => role.team === team)
+                  .map((role) => (
+                    <li>
+                      <a
+                        href={role.applyUrl || undefined}
+                        class="role-row group grid items-center gap-x-6 gap-y-1 rounded-2xl bg-surface p-5 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-[1fr_auto] lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)_7rem_2.25rem] lg:px-6"
+                      >
+                        <span class="text-[1.05rem] font-medium group-hover:text-brand">{role.title}</span>
+                        <span class="text-sm text-muted lg:text-base">{role.location}</span>
+                        <span class="hidden text-muted lg:block">{role.type}</span>
+                        <span class="role-go hidden size-9 place-items-center rounded-full bg-page lg:grid">
+                          <Icon name="arrow-right" class="size-4" stroke={2} />
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-20 sm:pb-28">
+    <div class="shell">
+      <div class="pattern reveal mx-auto flex max-w-4xl flex-col items-center gap-8 rounded-4xl bg-surface p-8 text-center shadow-[inset_0_0_0_1px_var(--line)] sm:p-14">
+        <div>
+          <h2 class="text-display-md">{careers.closing.title}</h2>
+          <p class="mx-auto mt-4 max-w-md text-muted">{careers.closing.body}</p>
+        </div>
+        <a href={careers.closing.cta.href} class="btn btn-primary">
+          {careers.closing.cta.label}
+          <Icon name="arrow-right" class="btn-arrow" stroke={2} />
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .role-row {
+    transition: box-shadow 0.25s;
+  }
+
+  .role-row[href]:hover {
+    box-shadow:
+      inset 0 0 0 1.5px var(--brand),
+      var(--shadow-float);
+  }
+
+  .role-go {
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .role-row[href]:hover .role-go {
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+
+  .role-filter {
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .role-filter:hover {
+    background: var(--sunken);
+  }
+
+  .role-filter[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--page);
+    box-shadow: none;
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-roles]");
+  const filters = root?.querySelector<HTMLElement>("[data-role-filters]");
+
+  if (root && filters) {
+    filters.hidden = false;
+    const buttons = [...filters.querySelectorAll<HTMLButtonElement>("[data-team]")];
+    const groups = [...root.querySelectorAll<HTMLElement>("[data-team-group]")];
+
+    buttons.forEach((button) =>
+      button.addEventListener("click", () => {
+        const team = button.dataset.team;
+        buttons.forEach((other) => other.setAttribute("aria-pressed", String(other === button)));
+        groups.forEach((group) => (group.hidden = team !== "all" && group.dataset.teamGroup !== team));
+      }),
+    );
+  }
+</script>

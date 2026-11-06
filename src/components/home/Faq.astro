@@ -1,0 +1,70 @@
+---
+import Accent from "@/components/ui/Accent.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { siteConfig } from "@/config/site";
+
+interface Props {
+  id?: string;
+  title: string;
+  lead?: string;
+  items: { q: string; a: string }[];
+}
+
+const { id, title, lead, items } = Astro.props;
+const headingId = `${id ?? "faq"}-title`;
+---
+
+<section id={id} class="py-20 sm:py-28" aria-labelledby={headingId}>
+  <div class="shell grid gap-12 lg:grid-cols-12">
+    <div class="reveal lg:col-span-4">
+      <h2 id={headingId} class="text-display-md"><Accent text={title} /></h2>
+      {lead && <p class="mt-4 text-muted">{lead}</p>}
+      <a href="/contact/" class="btn btn-ghost mt-8">
+        Contact us
+        <Icon name="arrow-right" class="btn-arrow" stroke={2} />
+      </a>
+      <p class="mt-4 text-sm text-muted">
+        Or email <a href={`mailto:${siteConfig.email}`} class="link">{siteConfig.email}</a>
+      </p>
+    </div>
+
+    <div class="grid gap-3 lg:col-span-8">
+      {
+        items.map((item) => (
+          <details class="faq reveal group rounded-panel bg-surface shadow-[inset_0_0_0_1px_var(--line)]" name={id ?? "faq"}>
+            <summary class="flex cursor-pointer items-center justify-between gap-6 px-6 py-5 text-lg font-medium tracking-tight">
+              {item.q}
+              <span class="faq-icon grid size-8 shrink-0 place-items-center rounded-full bg-page transition-colors">
+                <Icon name="plus" class="size-4" stroke={2} />
+              </span>
+            </summary>
+            <p class="px-6 pb-6 text-muted">{item.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq summary {
+    list-style: none;
+  }
+
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-icon :global(.icon) {
+    transition: transform 0.35s var(--ease-out-expo);
+  }
+
+  .faq[open] .faq-icon {
+    background: var(--ink);
+    color: var(--page);
+  }
+
+  .faq[open] .faq-icon :global(.icon) {
+    transform: rotate(45deg);
+  }
+</style>

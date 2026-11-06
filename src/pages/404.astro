@@ -1,0 +1,20 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+import Logomark from "@/components/ui/Logomark.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found" description="The page you were looking for does not exist or has moved." noindex>
+  <section class="pattern relative -mt-(--header-h) overflow-hidden">
+    <div class="shell relative grid min-h-svh content-center justify-items-center py-32 text-center">
+      <Logomark class="rise size-16" />
+      <p class="rise mt-8 text-[clamp(6rem,3.5rem+12vw,12rem)] leading-[0.8] font-medium tracking-[-0.06em] text-brand" style="--i:1" aria-hidden="true">404</p>
+      <h1 class="rise mt-8 text-display-md" style="--i:2">This page took a wrong <em>turn</em></h1>
+      <p class="rise mt-4 max-w-md text-lead text-muted" style="--i:3">It may have moved, or the link was mistyped. Try the homepage or the blog.</p>
+      <div class="rise mt-10 flex flex-wrap justify-center gap-3" style="--i:4">
+        <a href="/" class="btn btn-primary">Back home <Icon name="arrow-right" class="btn-arrow" stroke={2} /></a>
+        <a href="/blog/" class="btn btn-ghost">Read the blog</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

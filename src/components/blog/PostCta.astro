@@ -1,0 +1,57 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+import { postCta } from "@/config/blog";
+import { siteConfig } from "@/config/site";
+
+interface Props {
+  title?: string;
+  body?: string;
+  label?: string;
+  href?: string;
+  /** On a post page, moves the panel below this many `##` sections of the article. */
+  after?: number;
+}
+
+const {
+  title = postCta.title,
+  body = postCta.body,
+  label = siteConfig.actions.primary.label,
+  href = siteConfig.actions.primary.href,
+  after,
+} = Astro.props;
+---
+
+<aside class="post-cta on-night pattern relative overflow-hidden rounded-card [--glow:90%_120%_at_100%_0%] text-base leading-normal" data-after={after}>
+  <div class="relative grid gap-6 p-6 sm:p-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+    <div>
+      <p class="text-title">{title}</p>
+      <p class="mt-2 max-w-lg text-night-muted">{body}</p>
+    </div>
+    <a href={href} class="btn btn-spark justify-self-start">
+      {label}
+      <Icon name="arrow-right" class="btn-arrow" stroke={2} />
+    </a>
+  </div>
+</aside>
+{
+  after && (
+    <script is:inline>
+      (() => {
+        const cta = document.currentScript.previousElementSibling;
+        const next = document.querySelectorAll(".prose > h2")[Number(cta.dataset.after)];
+        if (next) next.before(cta);
+      })();
+    </script>
+  )
+}
+
+<style>
+  .post-cta {
+    margin-top: 3.5rem;
+  }
+
+  /* Moved into the article: beats `.prose > * + *`, which is unlayered. */
+  :global(.prose) > .post-cta {
+    margin-block: 3rem;
+  }
+</style>

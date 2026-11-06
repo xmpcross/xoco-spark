@@ -1,0 +1,47 @@
+---
+import Closing from "@/components/home/Closing.astro";
+import Faq from "@/components/home/Faq.astro";
+import LogoStrip from "@/components/home/LogoStrip.astro";
+import BillingToggle from "@/components/pricing/BillingToggle.astro";
+import CompareTable from "@/components/pricing/CompareTable.astro";
+import PlanCards from "@/components/pricing/PlanCards.astro";
+import Accent from "@/components/ui/Accent.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { pricing } from "@/config/pricing";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Pricing" description={pricing.lead}>
+  <section class="pattern -mt-(--header-h) pt-[calc(var(--header-h)+3rem)] pb-14 text-center sm:pt-[calc(var(--header-h)+5rem)]">
+    <div class="shell">
+      <h1 class="rise mx-auto max-w-4xl text-display-xl" style="--i:1"><Accent text={pricing.title} /></h1>
+      <p class="rise mx-auto mt-6 max-w-2xl text-lead text-muted" style="--i:2">{pricing.lead}</p>
+      <BillingToggle class="rise mx-auto mt-10" />
+    </div>
+  </section>
+
+  <section class="shell" aria-label="Plans">
+    <PlanCards />
+    <ul class="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted">
+      {
+        pricing.notes.map((note) => (
+          <li class="inline-flex items-center gap-1.5">
+            <Icon name="circle-check" class="size-4 text-good" />
+            {note}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <LogoStrip />
+
+  <section class="shell pb-16 lg:pb-24" aria-labelledby="compare-title">
+    <h2 id="compare-title" class="reveal mb-6 text-center text-display-md">{pricing.compareTitle}</h2>
+    <CompareTable />
+  </section>
+
+  <Faq id="pricing-faq" {...pricing.faq} />
+
+  <Closing />
+</BaseLayout>

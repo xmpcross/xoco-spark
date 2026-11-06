@@ -1,0 +1,20 @@
+---
+import Accent from "@/components/ui/Accent.astro";
+
+interface Props {
+  title: string;
+  lead?: string;
+  align?: "center" | "start";
+  /** Heading id, for `aria-labelledby` on the section. */
+  id?: string;
+  class?: string;
+}
+
+const { title, lead, align = "center", id, class: className } = Astro.props;
+---
+
+<div class:list={["reveal", align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-2xl", className]}>
+  <h2 id={id} class="text-display-lg"><Accent text={title} /></h2>
+  {lead && <p class:list={["mt-5 text-lead text-muted", align === "center" && "mx-auto max-w-2xl"]}>{lead}</p>}
+  <slot />
+</div>

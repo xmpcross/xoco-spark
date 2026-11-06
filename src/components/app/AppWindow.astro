@@ -1,0 +1,56 @@
+---
+interface Props {
+  /** Describes the view for screen readers; without it the window is decorative. */
+  label?: string;
+  /** The ground the window sits on. */
+  tone?: "light" | "dark";
+  class?: string;
+}
+
+const { label, tone = "dark", class: className } = Astro.props;
+---
+
+<div
+  class:list={["app-window relative overflow-hidden rounded-[1.1rem] p-1.5 text-left text-ink select-none sm:rounded-[1.35rem] sm:p-2", tone, className]}
+  role={label ? "img" : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : "true"}
+>
+  <div class="screen overflow-hidden rounded-[0.8rem] bg-surface sm:rounded-[0.95rem]">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .dark {
+    background: rgb(255 255 255 / 0.12);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.22),
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      0 40px 80px -30px rgb(8 6 40 / 0.55);
+    backdrop-filter: blur(24px) saturate(1.3);
+  }
+
+  .dark .screen {
+    box-shadow: 0 0 0 1px rgb(8 6 40 / 0.18);
+  }
+
+  .light {
+    background: rgb(255 255 255 / 0.55);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.7),
+      0 0 0 1px rgb(12 12 29 / 0.06),
+      0 30px 60px -30px rgb(12 12 29 / 0.25);
+  }
+
+  .light .screen {
+    box-shadow:
+      0 0 0 1px rgb(12 12 29 / 0.08),
+      0 1px 3px rgb(12 12 29 / 0.06);
+  }
+
+  /* Outranks the night section's muted colour, which is meant for text on dark. */
+  .screen :global(.text-muted) {
+    color: var(--muted);
+  }
+</style>

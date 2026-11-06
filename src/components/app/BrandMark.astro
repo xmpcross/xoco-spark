@@ -1,0 +1,36 @@
+---
+interface Props {
+  /** A file in `src/assets/integrations`, without `.svg`. */
+  name: string;
+  class?: string;
+}
+
+const files = import.meta.glob<string>("/src/assets/integrations/*.svg", { query: "?raw", import: "default", eager: true });
+
+/* Each brand's own colour, so the marks read as the real services. */
+const colours: Record<string, string> = {
+  shopify: "#5e8e3e",
+  stripe: "#635bff",
+  zendesk: "#03363d",
+  slack: "#4a154b",
+  hubspot: "#ff7a59",
+  salesforce: "#00a1e0",
+  whatsapp: "#25d366",
+  twilio: "#f22f46",
+  intercom: "#1f8ded",
+  okta: "#007dc1",
+  gmail: "#ea4335",
+  notion: "#0e0e1c",
+  jira: "#0052cc",
+  confluence: "#1868db",
+  googledrive: "#1fa463",
+  snowflake: "#29b5e8",
+};
+
+const { name, class: className = "size-5" } = Astro.props;
+const svg = (files[`/src/assets/integrations/${name}.svg`] ?? "").replace(/<title>[\s\S]*?<\/title>/, "").replace("<svg ", '<svg fill="currentColor" aria-hidden="true" ');
+---
+
+<span class:list={["grid shrink-0 place-items-center rounded-[28%] bg-surface shadow-[inset_0_0_0_1px_var(--line)]", className]} style={`color:${colours[name] ?? "var(--ink)"}`}>
+  <span class="block size-[58%] [&>svg]:size-full" set:html={svg} />
+</span>

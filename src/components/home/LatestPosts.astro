@@ -1,0 +1,35 @@
+---
+import PostCard from "@/components/blog/PostCard.astro";
+import Accent from "@/components/ui/Accent.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { latestPosts } from "@/config/home";
+import { getPosts } from "@/lib/posts";
+
+const posts = (await getPosts()).slice(0, 3);
+---
+
+{
+  posts.length > 0 && (
+    <section class="py-20 sm:py-28" aria-labelledby="latest-title">
+      <div class="shell">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div class="reveal">
+            <h2 id="latest-title" class="text-display-md">
+              <Accent text={latestPosts.title} />
+            </h2>
+          </div>
+          <a href={latestPosts.cta.href} class="btn btn-ghost reveal">
+            {latestPosts.cta.label} <Icon name="arrow-right" class="btn-arrow" stroke={2} />
+          </a>
+        </div>
+        <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <div class="reveal">
+              <PostCard post={post} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

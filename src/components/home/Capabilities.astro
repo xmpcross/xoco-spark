@@ -1,0 +1,240 @@
+---
+import { Image } from "astro:assets";
+import Icon from "@/components/ui/Icon.astro";
+import SectionHead from "@/components/ui/SectionHead.astro";
+import { capabilities } from "@/config/home";
+
+const { actions, channels, languages, guardrails, knowledge, handoff } = capabilities;
+---
+
+<section id={capabilities.id} class="py-20 sm:py-28" aria-labelledby="capabilities-title">
+  <div class="shell">
+    <SectionHead id="capabilities-title" title={capabilities.title} lead={capabilities.lead} />
+
+    <div class="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <article class="bento reveal bg-brand-wash md:col-span-2">
+        <div class="bento-copy">
+          <h3 class="bento-title">{actions.title}</h3>
+          <p class="bento-body">{actions.body}</p>
+        </div>
+        <ol class="mt-auto grid gap-2 pt-8">
+          {
+            actions.calls.map((call, index) => (
+              <li class="call flex items-center gap-3 rounded-2xl bg-surface px-4 py-3 shadow-[0_1px_2px_rgb(12_12_29/0.05)]" style={`--d:${index * 0.9}s`}>
+                <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                  <Icon name="zap" class="size-4" />
+                </span>
+                <code class="min-w-0 truncate font-mono text-sm font-semibold">{call.tool}</code>
+                <span class="hidden truncate text-sm text-muted sm:block">{call.detail}</span>
+                <span class="call-ok ml-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-good-soft px-2 py-0.5 text-xs font-semibold text-good">
+                  <Icon name="check" class="size-3" stroke={3} />200
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </article>
+
+      <article class="bento reveal bg-surface shadow-[inset_0_0_0_1px_var(--line)]">
+        <div class="bento-copy">
+          <h3 class="bento-title">{guardrails.title}</h3>
+          <p class="bento-body">{guardrails.body}</p>
+        </div>
+        <ul class="mt-auto grid gap-2.5 pt-8">
+          {
+            guardrails.checks.map((check, index) => (
+              <li class="guard flex items-center gap-3 rounded-xl bg-page px-3.5 py-2.5 text-[0.9375rem] font-medium" style={`--d:${index * 0.35}s`}>
+                <span class="guard-tick grid size-6 place-items-center rounded-full">
+                  <Icon name="check" class="size-3.5" stroke={3} />
+                </span>
+                {check}
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+
+      <article class="bento on-night reveal">
+        <div class="bento-copy">
+          <h3 class="bento-title">{languages.title}</h3>
+          <p class="bento-body text-night-muted!">{languages.body}</p>
+        </div>
+        <div class="mt-auto flex items-end justify-between gap-4 pt-10">
+          <span class="words relative block h-[4.5rem] flex-1 overflow-hidden text-6xl leading-[4.5rem] font-medium tracking-tight text-spark" aria-hidden="true">
+            <span class="words-track block" data-words>
+              {[...languages.words, languages.words[0]].map((word) => <span class="block">{word}</span>)}
+            </span>
+          </span>
+          <Icon name="languages" class="mb-2 size-7 text-night-muted" />
+        </div>
+      </article>
+
+      <article class="bento card reveal">
+        <div class="bento-copy">
+          <h3 class="bento-title">{knowledge.title}</h3>
+          <p class="bento-body">{knowledge.body}</p>
+        </div>
+        <ul class="mt-auto grid gap-3 pt-8">
+          {
+            knowledge.sources.map((source, index) => (
+              <li class="rounded-xl bg-page px-4 py-3">
+                <span class="flex items-center justify-between text-sm">
+                  <span class="font-medium">{source.label}</span>
+                  <span class="text-muted tabular">{source.count}</span>
+                </span>
+                <span class="mt-2 block h-1.5 overflow-hidden rounded-full bg-ink/8">
+                  <span class="sync block h-full rounded-full bg-brand" style={`--d:${index * 0.5}s`} />
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+
+      <article class="bento card reveal">
+        <div class="bento-copy">
+          <h3 class="bento-title">{channels.title}</h3>
+          <p class="bento-body">{channels.body}</p>
+        </div>
+        <ul class="mt-auto grid grid-cols-3 gap-2.5 pt-8">
+          {
+            channels.items.map((channel) => (
+              <li class="grid aspect-square place-items-center content-center gap-2 rounded-2xl bg-page text-sm font-medium">
+                <span class="grid size-11 place-items-center rounded-xl bg-ink text-spark">
+                  <Icon name={channel.icon} class="size-5" />
+                </span>
+                {channel.label}
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+
+      <article class="bento reveal gap-8 bg-surface lg:grid! shadow-[inset_0_0_0_1px_var(--line)] md:col-span-2 lg:col-span-3 lg:grid-cols-2 lg:items-center">
+        <div class="bento-copy lg:max-w-md">
+          <h3 class="bento-title">{handoff.title}</h3>
+          <p class="bento-body">{handoff.body}</p>
+        </div>
+        <div class="relative rounded-[1.4rem] bg-page p-4 sm:p-5">
+          <div class="flex items-center gap-3">
+            <span class="grid size-9 place-items-center rounded-xl bg-brand text-spark">
+              <Icon name="sparkles" class="size-4.5" />
+            </span>
+            <span class="h-px flex-1 border-t-[1.5px] border-dashed border-brand/40"></span>
+            <span class="rounded-full bg-surface px-3 py-1 text-xs font-semibold shadow-[0_0_0_1px_var(--line)]">{handoff.badge}</span>
+            <span class="h-px flex-1 border-t-[1.5px] border-dashed border-brand/40"></span>
+            <Image src={handoff.to.photo} alt="" width={72} height={72} class="size-9 rounded-xl object-cover" />
+          </div>
+          <div class="mt-4 rounded-2xl bg-surface p-4 shadow-[0_0_0_1px_var(--line)]">
+            <p class="text-xs font-semibold tracking-wide text-muted uppercase">Summary for {handoff.to.name}</p>
+            <p class="mt-1.5 text-[0.9375rem] leading-snug">{handoff.summary}</p>
+            <div class="mt-3 flex flex-wrap gap-2 text-xs font-medium">
+              {
+                handoff.attachments.map((item) => (
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-sunken px-2.5 py-1">
+                    <Icon name={item.icon} class="size-3.5" />
+                    {item.label}
+                  </span>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bento {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    padding: 1.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .bento {
+      padding: 2.25rem;
+    }
+  }
+
+  .bento-title {
+    font-size: var(--text-title);
+    line-height: var(--text-title--line-height);
+    letter-spacing: var(--text-title--letter-spacing);
+  }
+
+  .bento-body {
+    margin-top: 0.5rem;
+    color: var(--muted);
+  }
+
+  .call-ok,
+  .guard-tick {
+    animation: pop 4s var(--ease-spring) var(--d) infinite both;
+  }
+
+  .guard-tick {
+    background: var(--good);
+    color: white;
+  }
+
+  @keyframes pop {
+    0%,
+    8% {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    18%,
+    90% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .words-track {
+    transition: transform 0.7s var(--ease-out-expo);
+  }
+
+  .sync {
+    animation: sync 3.2s var(--ease-out-expo) var(--d) infinite both;
+  }
+
+  @keyframes sync {
+    from {
+      width: 8%;
+    }
+    70%,
+    to {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-words]").forEach((track) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const count = track.children.length - 1;
+    let index = 0;
+    window.setInterval(() => {
+      index += 1;
+      track.style.transform = `translateY(-${index * 4.5}rem)`;
+      /* The last word repeats the first, so the loop can jump back unseen. */
+      if (index === count) {
+        window.setTimeout(() => {
+          track.style.transition = "none";
+          track.style.transform = "";
+          index = 0;
+          void track.offsetHeight;
+          track.style.transition = "";
+        }, 750);
+      }
+    }, 1800);
+  });
+</script>

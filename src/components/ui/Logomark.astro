@@ -1,0 +1,19 @@
+---
+import mark from "@/assets/brand/logomark.svg?raw";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={["logomark grid shrink-0 place-items-center rounded-[30%] bg-surface text-ink shadow-[inset_0_0_0_1px_var(--line)]", className]} aria-hidden="true">
+  <span class="h-3/5 [&>svg]:h-full [&>svg]:w-auto" set:html={mark} />
+</span>
+
+<style>
+  .logomark :global(.logo-mark) {
+    fill: var(--brand);
+  }
+</style>

@@ -1,0 +1,84 @@
+---
+import { Image } from "astro:assets";
+import CompanyLogo from "@/components/ui/CompanyLogo.astro";
+import SectionHead from "@/components/ui/SectionHead.astro";
+import { testimonials } from "@/config/home";
+
+const [lead, ...rest] = testimonials.items;
+---
+
+<section id={testimonials.id} class="py-20 sm:py-28" aria-labelledby="customers-title">
+  <div class="shell">
+    <SectionHead id="customers-title" title={testimonials.title} />
+
+    <div class="mt-14 grid gap-4 lg:grid-cols-3">
+      {
+        lead && (
+          <figure class="on-night pattern reveal grid gap-8 overflow-hidden rounded-card p-3 [--glow:70%_90%_at_100%_0%] md:grid-cols-[minmax(0,20rem)_1fr] lg:col-span-3">
+            <Image
+              src={lead.photo}
+              alt=""
+              widths={[400, 640, 800]}
+              sizes="(min-width: 48rem) 20rem, 94vw"
+              class="aspect-4/3 h-full w-full rounded-[1.4rem] object-cover md:aspect-auto"
+              style={lead.focus ? `object-position:${lead.focus}` : undefined}
+            />
+            <div class="flex flex-col p-4 sm:p-6 md:py-8 md:pr-10">
+              <CompanyLogo name={lead.company} class="text-night-ink" />
+              <blockquote class="mt-8 text-[clamp(1.35rem,1.1rem+1vw,2rem)] leading-snug tracking-tight">
+                <p>
+                  <span class="text-spark">“</span>
+                  {lead.quote}
+                  <span class="text-spark">”</span>
+                </p>
+              </blockquote>
+              <div class="mt-auto flex flex-wrap items-end justify-between gap-6 pt-10">
+                <figcaption>
+                  <span class="block font-semibold">{lead.name}</span>
+                  <span class="block text-sm text-night-muted">
+                    {lead.role}, {lead.company}
+                  </span>
+                </figcaption>
+                <p class="text-right">
+                  <span class="block text-6xl leading-none font-medium tracking-tight text-spark">{lead.result.value}</span>
+                  <span class="mt-1 block text-sm text-night-muted">{lead.result.label}</span>
+                </p>
+              </div>
+            </div>
+          </figure>
+        )
+      }
+
+      {
+        rest.map((item, index) => (
+          <figure class="card reveal flex flex-col p-7 sm:p-8" style={`--i:${index}`}>
+            <div class="flex items-start justify-between gap-4">
+              <CompanyLogo name={item.company} class="text-[1.1rem]" />
+              <p class="text-right">
+                <span class="block text-4xl leading-none font-medium tracking-tight text-brand">{item.result.value}</span>
+                <span class="mt-1 block max-w-32 text-xs leading-snug text-muted">{item.result.label}</span>
+              </p>
+            </div>
+            <blockquote class="mt-8 text-lg leading-relaxed">
+              <p>“{item.quote}”</p>
+            </blockquote>
+            <figcaption class="mt-auto flex items-center gap-3 pt-8">
+              <Image
+                src={item.photo}
+                alt=""
+                width={96}
+                height={96}
+                class="size-11 rounded-full object-cover"
+                style={item.focus ? `object-position:${item.focus}` : undefined}
+              />
+              <span>
+                <span class="block font-semibold">{item.name}</span>
+                <span class="block text-sm text-muted">{item.role}</span>
+              </span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

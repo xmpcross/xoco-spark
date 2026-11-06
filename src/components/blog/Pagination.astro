@@ -1,0 +1,32 @@
+---
+interface Props {
+  current: number;
+  last: number;
+  /** Page 1 of the archive, e.g. `/blog/`. Later pages add `N/`. */
+  base: string;
+}
+
+const { current, last, base } = Astro.props;
+const href = (page: number) => (page === 1 ? base : `${base}${page}/`);
+---
+
+{
+  last > 1 && (
+    <nav aria-label="Pagination" class="mt-20 flex justify-center">
+      <ol class="flex gap-1 rounded-full bg-surface p-1 text-sm font-medium shadow-[inset_0_0_0_1px_var(--line)] tabular">
+        {Array.from({ length: last }, (_, i) => i + 1).map((page) => (
+          <li>
+            <a
+              href={href(page)}
+              aria-current={page === current ? "page" : undefined}
+              aria-label={`Page ${page}`}
+              class:list={["grid size-10 place-items-center rounded-full", page === current ? "bg-ink text-page" : "hover:bg-page"]}
+            >
+              {page}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}

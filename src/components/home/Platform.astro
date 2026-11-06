@@ -1,0 +1,111 @@
+---
+import AppWindow from "@/components/app/AppWindow.astro";
+import ChannelsView from "@/components/app/ChannelsView.astro";
+import InsightsView from "@/components/app/InsightsView.astro";
+import PlaybookView from "@/components/app/PlaybookView.astro";
+import Icon from "@/components/ui/Icon.astro";
+import SectionHead from "@/components/ui/SectionHead.astro";
+import { platform } from "@/config/home";
+
+const views = { build: PlaybookView, launch: ChannelsView, improve: InsightsView };
+const steps = platform.steps.map((step) => ({ ...step, View: views[step.view] }));
+---
+
+<section id={platform.id} class="on-night pattern overflow-clip py-20 sm:py-28" aria-labelledby="platform-title" data-platform>
+  <div class="shell">
+    <SectionHead id="platform-title" title={platform.title} lead={platform.lead} />
+
+    <div class="mt-12 grid gap-10 lg:mt-4 lg:grid-cols-12 lg:gap-14">
+      <ol class="lg:col-span-4">
+        {
+          steps.map((step, index) => (
+            <li class="step flex flex-col justify-center py-8 lg:min-h-[78vh] lg:py-0" data-step={index}>
+              <p class="inline-flex items-center gap-2.5 text-sm font-semibold text-spark">
+                <span class="grid size-7 place-items-center rounded-full bg-spark/12 tabular">{index + 1}</span>
+                {step.label}
+              </p>
+              <h3 class="mt-4 text-[clamp(1.75rem,1.3rem+1.2vw,2.4rem)] leading-[1.08] tracking-[-0.035em]">{step.title}</h3>
+              <p class="mt-4 text-night-muted">{step.body}</p>
+              <ul class="mt-6 grid gap-2.5">
+                {step.points.map((point) => (
+                  <li class="flex items-start gap-3">
+                    <Icon name="check" class="mt-1 size-4 text-spark" stroke={2.5} />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+              <AppWindow label={step.viewLabel} class="mt-8 lg:hidden">
+                <step.View class="h-120" />
+              </AppWindow>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="hidden lg:col-span-8 lg:block">
+        <div class="sticky top-32 flex justify-end">
+          <div class="grid w-full shrink-0 min-[90rem]:w-209">
+            {
+              steps.map((step, index) => (
+                <div class:list={["screen [grid-area:1/1]", index === 0 && "is-active"]} data-screen={index}>
+                  <AppWindow label={step.viewLabel}>
+                    <step.View class="h-136" />
+                  </AppWindow>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .screen {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.45s,
+      visibility 0.45s;
+  }
+
+  .screen.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (min-width: 64rem) {
+    [data-ready] .step {
+      opacity: 0.3;
+      transition: opacity 0.5s;
+    }
+
+    [data-ready] .step.is-active {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-platform]");
+
+  if (root) {
+    const steps = [...root.querySelectorAll<HTMLElement>("[data-step]")];
+    const screens = [...root.querySelectorAll<HTMLElement>("[data-screen]")];
+    const activate = (index: number) => {
+      steps.forEach((step, i) => step.classList.toggle("is-active", i === index));
+      screens.forEach((screen, i) => screen.classList.toggle("is-active", i === index));
+    };
+    root.setAttribute("data-ready", "");
+    activate(0);
+    const observer = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) activate(Number((entry.target as HTMLElement).dataset.step));
+        }),
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    steps.forEach((step) => observer.observe(step));
+  }
+</script>

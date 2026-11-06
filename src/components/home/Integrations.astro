@@ -1,0 +1,114 @@
+---
+import Logomark from "@/components/ui/Logomark.astro";
+import Icon from "@/components/ui/Icon.astro";
+import SectionHead from "@/components/ui/SectionHead.astro";
+import { integrations } from "@/config/home";
+
+const files = import.meta.glob<string>("/src/assets/integrations/*.svg", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+const icon = (name: string) => {
+  const raw = files[`/src/assets/integrations/${name}.svg`] ?? "";
+  return {
+    name: raw.match(/<title>([^<]*)<\/title>/)?.[1] ?? name,
+    svg: raw.replace(/<title>[\s\S]*?<\/title>/, "").replace("<svg ", '<svg fill="currentColor" aria-hidden="true" '),
+  };
+};
+
+const rings = [
+  { items: integrations.inner.map(icon), radius: 31, className: "orbit-inner" },
+  { items: integrations.outer.map(icon), radius: 47, className: "orbit-outer" },
+];
+const names = [...integrations.inner, ...integrations.outer].map((name) => icon(name).name);
+---
+
+<section id={integrations.id} class="overflow-hidden py-20 sm:py-28" aria-labelledby="integrations-title">
+  <div class="shell grid items-center gap-14 lg:grid-cols-2">
+    <SectionHead id="integrations-title" align="start" title={integrations.title} lead={integrations.lead}>
+      <ul class="mt-8 flex flex-wrap gap-2">
+        {integrations.categories.map((category) => <li class="rounded-full bg-surface px-3.5 py-1.5 text-sm font-medium shadow-[inset_0_0_0_1px_var(--line)]">{category}</li>)}
+      </ul>
+      <p class="sr-only">Connectors include {names.join(", ")}.</p>
+      <a href={integrations.cta.href} class="btn btn-primary mt-9">
+        {integrations.cta.label}
+        <Icon name="arrow-right" class="btn-arrow" stroke={2} />
+      </a>
+    </SectionHead>
+
+    <div class="orbit reveal relative mx-auto aspect-square w-full max-w-xl" aria-hidden="true">
+      <div class="absolute inset-[3%] rounded-full border border-dashed border-ink/12"></div>
+      <div class="absolute inset-[19%] rounded-full border border-ink/8 bg-brand-soft/40"></div>
+      <div class="absolute inset-0 grid place-items-center">
+        <div class="core rounded-[30%] shadow-(--shadow-lift)">
+          <Logomark class="size-24 sm:size-28" />
+        </div>
+      </div>
+      {
+        rings.map((ring) => (
+          <div class:list={["orbit-ring absolute inset-0", ring.className]}>
+            {ring.items.map((item, index) => {
+              const angle = (index / ring.items.length) * Math.PI * 2 - Math.PI / 2;
+              const x = 50 + Math.cos(angle) * ring.radius;
+              const y = 50 + Math.sin(angle) * ring.radius;
+              return (
+                <span class="tile absolute grid -translate-1/2 place-items-center rounded-2xl bg-surface shadow-(--shadow-float)" style={`left:${x}%;top:${y}%`} title={item.name}>
+                  <span class="tile-icon block size-[45%] text-ink" set:html={item.svg} />
+                </span>
+              );
+            })}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .tile {
+    width: 13%;
+    aspect-ratio: 1;
+  }
+
+  .tile-icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .orbit-ring {
+    animation: orbit 90s linear infinite;
+  }
+
+  .orbit-outer {
+    animation-duration: 140s;
+    animation-direction: reverse;
+  }
+
+  .orbit-ring .tile {
+    animation: orbit 90s linear infinite reverse;
+  }
+
+  .orbit-outer .tile {
+    width: 11%;
+    animation-duration: 140s;
+    animation-direction: normal;
+  }
+
+  @keyframes orbit {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  .core {
+    animation: breathe 5s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    50% {
+      transform: scale(1.04);
+    }
+  }
+</style>

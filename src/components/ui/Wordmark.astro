@@ -1,0 +1,23 @@
+---
+import logo from "@/assets/brand/logo.svg?raw";
+import { siteConfig } from "@/config/site";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span
+  class:list={["wordmark inline-flex h-7 [&>svg]:h-full [&>svg]:w-auto", className]}
+  role="img"
+  aria-label={siteConfig.name}
+  set:html={logo}
+/>
+
+<style>
+  .wordmark :global(.logo-mark) {
+    fill: var(--brand);
+  }
+</style>

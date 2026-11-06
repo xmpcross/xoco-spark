@@ -1,0 +1,59 @@
+---
+import { Image } from "astro:assets";
+import Icon from "@/components/ui/Icon.astro";
+import { people } from "@/config/demo";
+
+interface Props {
+  /** A key in `people` from `src/config/demo.ts`, or any name for initials. */
+  name: string;
+  /** Adds a small channel badge on the corner. */
+  channel?: "chat" | "email" | "whatsapp" | "voice";
+  class?: string;
+}
+
+const { name, channel, class: className = "size-8" } = Astro.props;
+const photo = people[name]?.photo;
+const initials = name
+  .split(" ")
+  .map((part) => part[0])
+  .slice(0, 2)
+  .join("");
+const badge = { chat: "message-circle", email: "mail", whatsapp: "social-whatsapp", voice: "phone" };
+---
+
+<span class:list={["relative inline-grid shrink-0", className]}>
+  {
+    photo ? (
+      <Image src={photo} alt="" widths={[48, 96, 144]} sizes="3rem" class="absolute inset-0 size-full rounded-full object-cover object-[50%_30%]" />
+    ) : (
+      <span class="grid size-full place-items-center rounded-full bg-brand-soft font-semibold text-brand-ink [container-type:size]">
+        <span class="text-[40cqw] leading-none">{initials}</span>
+      </span>
+    )
+  }
+  {
+    channel && (
+      <span class:list={["channel absolute -right-0.5 -bottom-0.5 grid size-[42%] min-w-3.5 min-h-3.5 place-items-center rounded-full text-white ring-2 ring-surface", `channel-${channel}`]}>
+        <Icon name={badge[channel]} class="size-[62%]" stroke={2.25} />
+      </span>
+    )
+  }
+</span>
+
+<style>
+  .channel-chat {
+    background: var(--brand);
+  }
+
+  .channel-email {
+    background: #2d8cff;
+  }
+
+  .channel-whatsapp {
+    background: #25d366;
+  }
+
+  .channel-voice {
+    background: var(--ink);
+  }
+</style>

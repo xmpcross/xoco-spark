@@ -1,0 +1,37 @@
+---
+import Avatar from "@/components/app/Avatar.astro";
+import Icon from "@/components/ui/Icon.astro";
+import Logomark from "@/components/ui/Logomark.astro";
+
+interface Props {
+  active?: "inbox" | "playbooks" | "channels" | "insights";
+}
+
+const { active = "inbox" } = Astro.props;
+const items = [
+  { id: "inbox", icon: "inbox", count: 3 },
+  { id: "playbooks", icon: "workflow" },
+  { id: "channels", icon: "layers" },
+  { id: "insights", icon: "chart-line" },
+  { id: "knowledge", icon: "book-open" },
+  { id: "customers", icon: "users" },
+];
+---
+
+<div class="rail flex w-13 shrink-0 flex-col items-center border-r border-line bg-page/60 py-3.5">
+  <Logomark class="size-8 shadow-[inset_0_0_0_1px_var(--line),0_1px_2px_rgb(12_12_29/0.06)]" />
+  <ul class="mt-6 grid gap-1.5">
+    {
+      items.map((item) => (
+        <li class:list={["relative grid size-8.5 place-items-center rounded-lg", item.id === active ? "bg-surface text-ink shadow-[inset_0_0_0_1px_var(--line),0_1px_2px_rgb(12_12_29/0.06)]" : "text-muted"]}>
+          <Icon name={item.icon} class="size-4" />
+          {item.count && <span class="absolute -top-0.5 -right-0.5 grid size-3.5 place-items-center rounded-full bg-brand text-[0.5625rem] font-semibold text-white ring-2 ring-page">{item.count}</span>}
+        </li>
+      ))
+    }
+  </ul>
+  <span class="mt-auto grid justify-items-center gap-4 text-muted">
+    <Icon name="settings" class="size-4" />
+    <Avatar name="Ana" class="size-7" />
+  </span>
+</div>

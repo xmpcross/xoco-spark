@@ -1,0 +1,188 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+/* The view can render twice on a page, and a gradient id inside a hidden copy paints nothing. */
+const fillId = `insights-fill-${Math.random().toString(36).slice(2, 8)}`;
+
+const kpis = [
+  { label: "Resolution rate", value: "82.4%", delta: "4.1 pts", up: true },
+  { label: "Customer rating", value: "4.8", unit: "/ 5", delta: "0.2", up: true },
+  { label: "Cost per resolution", value: "€0.84", delta: "12%", up: false },
+];
+
+/* Weekly share of conversations resolved by Spark, in %. */
+const weeks = [61, 63, 62, 66, 68, 67, 71, 73, 75, 77, 80, 82.4];
+const months = ["Jul", "Aug", "Sep", "Oct"];
+const width = 600;
+const height = 180;
+const [lo, hi] = [55, 85];
+const point = (i: number) => [(i / (weeks.length - 1)) * width, height - ((weeks[i] - lo) / (hi - lo)) * height] as const;
+
+/* A Catmull-Rom spline through every point, drawn as cubic Béziers. */
+const pts = weeks.map((_, i) => point(i));
+let line = `M${pts[0][0]},${pts[0][1]}`;
+for (let i = 0; i < pts.length - 1; i++) {
+  const [p0, p1, p2, p3] = [pts[i - 1] ?? pts[i], pts[i], pts[i + 1], pts[i + 2] ?? pts[i + 1]];
+  const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+  const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+  line += ` C${c1.join(",")} ${c2.join(",")} ${p2.join(",")}`;
+}
+const [lastX, lastY] = pts[pts.length - 1];
+
+/* Weekly count of the unanswered question. */
+const asked = [14, 22, 19, 31, 38, 47, 52, 61];
+---
+
+<div class:list={["insights flex w-full flex-col text-[0.8125rem] leading-snug", className]}>
+  <div class="flex h-13 shrink-0 items-center gap-2 border-b border-line px-4">
+    <span class="font-semibold">Insights</span>
+    <span class="ml-auto flex gap-0.5 rounded-lg bg-page p-0.5 text-[0.6875rem] font-medium text-muted shadow-[inset_0_0_0_1px_var(--line)]">
+      <span class="px-2 py-0.5">7d</span>
+      <span class="px-2 py-0.5">30d</span>
+      <span class="rounded-md bg-surface px-2 py-0.5 text-ink shadow-[0_1px_2px_rgb(12_12_29/0.08),0_0_0_1px_rgb(12_12_29/0.04)]">12w</span>
+    </span>
+    <span class="export hidden items-center gap-1 text-[0.6875rem] font-semibold"><Icon name="download" class="size-3.5" />Export</span>
+  </div>
+
+  <div class="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden bg-[color-mix(in_srgb,var(--page)_55%,var(--surface))] p-3 sm:p-4">
+    <dl class="kpis grid shrink-0 grid-cols-3 overflow-hidden rounded-xl bg-surface shadow-[inset_0_0_0_1px_var(--line),0_1px_2px_rgb(12_12_29/0.04)]">
+      {
+        kpis.map((kpi) => (
+          <div class="kpi min-w-0 p-3">
+            <dt class="truncate text-[0.6875rem] text-muted">{kpi.label}</dt>
+            <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+              <span class="kpi-value font-semibold tracking-[-0.03em] whitespace-nowrap tabular">
+                {kpi.value}
+                {kpi.unit && <span class="text-[0.6875rem] font-normal tracking-normal text-muted">{kpi.unit}</span>}
+              </span>
+              <span class="inline-flex items-center text-[0.625rem] font-semibold text-good tabular">
+                <Icon name={kpi.up ? "arrow-up-right" : "arrow-down-right"} class="size-3" stroke={2.25} />
+                {kpi.delta}
+              </span>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <div class="main grid min-h-0 flex-1 gap-3">
+      <div class="flex min-h-0 flex-col rounded-xl bg-surface p-3 shadow-[inset_0_0_0_1px_var(--line),0_1px_2px_rgb(12_12_29/0.04)]">
+        <p class="flex items-center gap-2">
+          <span class="font-semibold">Resolved by Spark</span>
+          <span class="ml-auto flex items-center gap-1.5 text-[0.6875rem] text-muted"><span class="size-2 rounded-xs bg-brand"></span>Weekly</span>
+        </p>
+        <div class="relative mt-3 min-h-24 flex-1">
+          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" class="absolute inset-0 size-full overflow-visible" aria-hidden="true">
+            <defs>
+              <linearGradient id={fillId} x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="var(--brand)" stop-opacity="0.18"></stop>
+                <stop offset="1" stop-color="var(--brand)" stop-opacity="0"></stop>
+              </linearGradient>
+            </defs>
+            {[0, 1, 2, 3].map((i) => <line x1="0" x2={width} y1={(height / 3) * i} y2={(height / 3) * i} stroke="var(--line)" vector-effect="non-scaling-stroke" />)}
+            <path d={`${line} L${width},${height} L0,${height} Z`} fill={`url(#${fillId})`} />
+            <path class="line" d={line} pathLength="1" fill="none" stroke="var(--brand)" stroke-width="2" vector-effect="non-scaling-stroke" />
+          </svg>
+          <span class="dot" style={`left:${(lastX / width) * 100}%;top:${(lastY / height) * 100}%`}></span>
+          <span class="tip absolute rounded-lg bg-ink px-2 py-1 text-white" style={`top:${(lastY / height) * 100}%`}>
+            <span class="block text-[0.75rem] font-semibold tabular">82.4%</span>
+            <span class="block text-[0.5625rem] whitespace-nowrap text-night-muted">Week of Oct 13</span>
+          </span>
+        </div>
+        <p class="mt-2 flex justify-between text-[0.625rem] text-muted">
+          {months.map((month) => <span>{month}</span>)}
+        </p>
+      </div>
+
+      <div class="fix hidden min-h-0 flex-col rounded-xl bg-surface p-3 shadow-[inset_0_0_0_1px_var(--line),0_1px_2px_rgb(12_12_29/0.04)]">
+        <p class="inline-flex w-fit items-center gap-1 rounded-md bg-brand-soft px-1.5 py-0.5 text-[0.6875rem] font-semibold text-brand-ink">
+          <Icon name="sparkles" class="size-3" />Suggested fix
+        </p>
+        <p class="mt-2.5 font-semibold">Gift card balance</p>
+        <p class="mt-1 text-[0.75rem] text-muted">412 customers asked how to check a gift card balance this month.</p>
+        <p class="mt-2.5 rounded-lg bg-page px-2.5 py-2 text-[0.6875rem] leading-normal shadow-[inset_0_0_0_1px_var(--line)]">
+          “Enter the 16-digit code at northwind.shop/balance, or ask me and I'll check it for you.”
+        </p>
+        <div class="mt-3 flex min-h-0 flex-1 flex-col">
+          <p class="flex items-center justify-between text-[0.6875rem] text-muted">Asked per week <span class="font-medium text-good">+1.8 pts if fixed</span></p>
+          <p class="mt-2 flex min-h-8 flex-1 items-end gap-1">
+            {asked.map((count, index) => <span class:list={["flex-1 rounded-[3px]", index === asked.length - 1 ? "bg-brand" : "bg-brand-soft"]} style={`height:${(count / 61) * 100}%`} />)}
+          </p>
+        </div>
+        <p class="flex gap-1.5 pt-3 text-[0.6875rem] font-semibold">
+          <span class="flex-1 rounded-lg py-1.5 text-center shadow-[inset_0_0_0_1px_var(--line)]">Review</span>
+          <span class="flex-1 rounded-lg bg-brand py-1.5 text-center text-white">Approve</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .insights {
+    container-type: inline-size;
+  }
+
+  .kpi + .kpi {
+    box-shadow: -1px 0 0 var(--line);
+  }
+
+  .kpi-value {
+    font-size: 1.0625rem;
+  }
+
+  .dot {
+    position: absolute;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 999px;
+    background: var(--brand);
+    box-shadow:
+      0 0 0 2px var(--surface),
+      0 0 0 6px color-mix(in srgb, var(--brand) 18%, transparent);
+    transform: translate(-50%, -50%);
+  }
+
+  .tip {
+    right: 1rem;
+    transform: translateY(-50%);
+  }
+
+  @container (min-width: 34rem) {
+    .kpi-value {
+      font-size: 1.375rem;
+    }
+
+    .export {
+      display: inline-flex;
+    }
+  }
+
+  @container (min-width: 44rem) {
+    .main {
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    }
+
+    .fix {
+      display: flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.is-active) .line {
+      stroke-dasharray: 1;
+      animation: draw 1.8s var(--ease-out-expo) 0.2s both;
+    }
+  }
+
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+interface Props {
+  tone?: "good" | "brand" | "warn" | "neutral";
+  /** Pulses the dot, for work in progress. */
+  live?: boolean;
+  class?: string;
+}
+
+const { tone = "neutral", live = false, class: className } = Astro.props;
+const tones = {
+  good: "bg-good-soft text-good",
+  brand: "bg-brand-soft text-brand-ink",
+  warn: "bg-warn-soft text-warn",
+  neutral: "bg-surface text-muted shadow-[inset_0_0_0_1px_var(--line)]",
+};
+---
+
+<span class:list={["pill inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 text-[0.6875rem] leading-[1.25rem] font-semibold whitespace-nowrap", tones[tone], className]}>
+  <span class:list={["dot size-1.5 rounded-full bg-current", live && "live"]}></span>
+  <slot />
+</span>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .live {
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+  }
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.35;
+    }
+  }
+</style>
